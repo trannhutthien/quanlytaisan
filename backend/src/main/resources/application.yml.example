@@ -1,0 +1,46 @@
+# Copy file này thành application.yml và điền thông tin thật của bạn
+# File application.yml sẽ KHÔNG được push lên Git
+
+spring:
+  application:
+    name: quanlytaisan
+    
+  datasource:
+    url: jdbc:mysql://localhost:3306/quanlytaisanqr?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Ho_Chi_Minh
+    username: your_database_username
+    password: your_database_password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+    open-in-view: false
+    
+  security:
+    user:
+      name: admin
+      password: change_this_password
+      
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+    
+# JWT Configuration
+# QUAN TRỌNG: Đổi secret key này thành chuỗi ngẫu nhiên mạnh
+jwt:
+  secret: CHANGE-THIS-TO-A-STRONG-RANDOM-SECRET-KEY-AT-LEAST-256-BITS
+  expiration: 86400000  # 24 hours in milliseconds
+
+# Logging
+logging:
+  level:
+    com.tvu.quanlytaisan: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE

@@ -1,0 +1,33 @@
+# Root .gitignore cho toàn bộ dự án
+
+# Thư mục tài liệu cá nhân (nếu có thông tin nhạy cảm)
+# docx/
+
+# File backup
+*.bak
+*.backup
+*.old
+
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+*~
