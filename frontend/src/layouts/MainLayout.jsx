@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Outlet, useNavigate } from 'react-router-dom'
+import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { Layout, Menu, Button, Dropdown } from 'antd'
 import {
   DashboardOutlined,
@@ -13,6 +13,10 @@ import {
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  BugOutlined,
+  TagsOutlined,
+  InboxOutlined,
+  ApartmentOutlined,
 } from '@ant-design/icons'
 import { useAuth } from '../hooks/useAuth'
 
@@ -21,9 +25,10 @@ const { Header, Sider, Content } = Layout
 const MainLayout = () => {
   const [collapsed, setCollapsed] = useState(false)
   const navigate = useNavigate()
+  const location = useLocation()
   const { user, logout } = useAuth()
 
-  const isAdmin = user?.vaiTro === 'ADMIN'
+  const isAdmin = user?.vaitro === 'ADMIN'
 
   const menuItems = [
     {
@@ -31,6 +36,12 @@ const MainLayout = () => {
       icon: <DashboardOutlined />,
       label: 'Dashboard',
       onClick: () => navigate('/'),
+    },
+    {
+      key: '/test',
+      icon: <BugOutlined />,
+      label: 'Test API',
+      onClick: () => navigate('/test'),
     },
     {
       key: '/taisan',
@@ -50,11 +61,11 @@ const MainLayout = () => {
       label: 'Luân chuyển',
       onClick: () => navigate('/luanchuyen'),
     },
-    {
-      key: '/baotri',
+    isAdmin && {
+      key: '/admin/bao-tri',
       icon: <ToolOutlined />,
       label: 'Bảo trì',
-      onClick: () => navigate('/baotri'),
+      onClick: () => navigate('/admin/bao-tri'),
     },
     isAdmin && {
       key: '/kiemke',
@@ -63,10 +74,35 @@ const MainLayout = () => {
       onClick: () => navigate('/kiemke'),
     },
     isAdmin && {
-      key: '/danhmuc',
+      key: 'admin',
       icon: <DatabaseOutlined />,
-      label: 'Danh mục',
-      onClick: () => navigate('/danhmuc'),
+      label: 'Quản lý',
+      children: [
+        {
+          key: '/admin/loai-tai-san',
+          icon: <TagsOutlined />,
+          label: 'Loại tài sản',
+          onClick: () => navigate('/admin/loai-tai-san'),
+        },
+        {
+          key: '/admin/tai-san',
+          icon: <InboxOutlined />,
+          label: 'Tài sản',
+          onClick: () => navigate('/admin/tai-san'),
+        },
+        {
+          key: '/admin/don-vi-vi-tri',
+          icon: <ApartmentOutlined />,
+          label: 'Đơn vị & Vị trí',
+          onClick: () => navigate('/admin/don-vi-vi-tri'),
+        },
+        {
+          key: '/danhmuc',
+          icon: <DatabaseOutlined />,
+          label: 'Danh mục khác',
+          onClick: () => navigate('/danhmuc'),
+        },
+      ],
     },
     isAdmin && {
       key: '/nguoidung',
@@ -88,11 +124,24 @@ const MainLayout = () => {
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sider trigger={null} collapsible collapsed={collapsed}>
-        <div style={{ height: 32, margin: 16, background: 'rgba(255, 255, 255, 0.2)', borderRadius: 6 }} />
+        <div style={{ 
+          height: 32, 
+          margin: 16, 
+          background: 'rgba(255, 255, 255, 0.2)', 
+          borderRadius: 6,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: '#fff',
+          fontWeight: 'bold',
+        }}>
+          {!collapsed && 'QL Tài Sản QR'}
+        </div>
         <Menu
           theme="dark"
           mode="inline"
-          defaultSelectedKeys={['/']}
+          selectedKeys={[location.pathname]}
+          defaultOpenKeys={['admin']}
           items={menuItems}
         />
       </Sider>
@@ -106,7 +155,7 @@ const MainLayout = () => {
           />
           <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
             <Button type="text" icon={<UserOutlined />}>
-              {user?.hoTen}
+              {user?.hoten || user?.tendangnhap}
             </Button>
           </Dropdown>
         </Header>

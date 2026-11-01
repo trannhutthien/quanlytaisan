@@ -1,8 +1,10 @@
 package com.tvu.quanlytaisan.entity;
 
+import com.tvu.quanlytaisan.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -11,9 +13,10 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "taisan")
 @Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class TaiSan {
+public class TaiSan extends BaseEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

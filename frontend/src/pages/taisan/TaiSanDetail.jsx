@@ -46,22 +46,22 @@ const TaiSanDetail = () => {
       label: 'Thông tin',
       children: (
         <Descriptions bordered column={2}>
-          <Descriptions.Item label="Mã tài sản">{taisan.maTaiSan}</Descriptions.Item>
-          <Descriptions.Item label="Tên tài sản">{taisan.tenTaiSan}</Descriptions.Item>
-          <Descriptions.Item label="Loại">{taisan.loaiTaiSan?.tenLoai}</Descriptions.Item>
-          <Descriptions.Item label="Đơn vị">{taisan.donVi?.tenDonVi}</Descriptions.Item>
-          <Descriptions.Item label="Vị trí">{taisan.viTri?.tenViTri}</Descriptions.Item>
+          <Descriptions.Item label="Mã tài sản">{taisan.mataisan}</Descriptions.Item>
+          <Descriptions.Item label="Tên tài sản">{taisan.tentaisan}</Descriptions.Item>
+          <Descriptions.Item label="Loại">{taisan.tenloai}</Descriptions.Item>
+          <Descriptions.Item label="Đơn vị">{taisan.tendonvi || 'Chưa có'}</Descriptions.Item>
+          <Descriptions.Item label="Vị trí">{taisan.tenvitri || 'Chưa có'}</Descriptions.Item>
           <Descriptions.Item label="Trạng thái">
-            <StatusTag status={taisan.trangThai} />
+            <StatusTag status={taisan.tentrangthai} />
           </Descriptions.Item>
-          <Descriptions.Item label="Giá trị ban đầu">
-            {formatCurrency(taisan.giaTriBanDau)}
+          <Descriptions.Item label="Giá trị">
+            {formatCurrency(taisan.giatri)}
           </Descriptions.Item>
-          <Descriptions.Item label="Ngày mua">
-            {formatDate(taisan.ngayMua)}
+          <Descriptions.Item label="Ngày nhập">
+            {formatDate(taisan.ngaynhap)}
           </Descriptions.Item>
-          <Descriptions.Item label="Mô tả" span={2}>
-            {taisan.moTa || 'Không có'}
+          <Descriptions.Item label="Thông số kỹ thuật" span={2}>
+            {taisan.thongsokythuat || 'Không có'}
           </Descriptions.Item>
         </Descriptions>
       ),

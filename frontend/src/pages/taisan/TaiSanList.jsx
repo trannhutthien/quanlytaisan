@@ -15,7 +15,7 @@ const TaiSanList = () => {
   const navigate = useNavigate()
   const { user } = useAuth()
 
-  const isAdmin = user?.vaiTro === 'ADMIN'
+  const isAdmin = user?.vaitro === 'ADMIN'
 
   const fetchData = async () => {
     try {
@@ -61,29 +61,29 @@ const TaiSanList = () => {
     },
     {
       title: 'Loại',
-      dataIndex: ['loaiTaiSan', 'tenLoai'],
+      dataIndex: 'tenloai',
       key: 'loai',
     },
     {
       title: 'Đơn vị',
-      dataIndex: ['donVi', 'tenDonVi'],
+      dataIndex: 'tendonvi',
       key: 'donvi',
     },
     {
       title: 'Vị trí',
-      dataIndex: ['viTri', 'tenViTri'],
+      dataIndex: 'tenvitri',
       key: 'vitri',
     },
     {
       title: 'Trạng thái',
-      dataIndex: 'trangThai',
+      dataIndex: 'tentrangthai',
       key: 'trangThai',
       render: (status) => <StatusTag status={status} />,
     },
     {
       title: 'Giá trị',
-      dataIndex: 'giaTriBanDau',
-      key: 'giaTriBanDau',
+      dataIndex: 'giatri',
+      key: 'giatri',
       render: (value) => formatCurrency(value),
     },
     isAdmin && {
@@ -93,14 +93,14 @@ const TaiSanList = () => {
         <Space>
           <Button
             icon={<EditOutlined />}
-            onClick={() => navigate(`/taisan/${record.id}/sua`)}
+            onClick={() => navigate(`/taisan/${record.taisanId}/sua`)}
           >
             Sửa
           </Button>
           <Button
             danger
             icon={<DeleteOutlined />}
-            onClick={() => handleDelete(record.id)}
+            onClick={() => handleDelete(record.taisanId)}
           >
             Xóa
           </Button>
@@ -128,7 +128,7 @@ const TaiSanList = () => {
       <Table
         columns={columns}
         dataSource={data}
-        rowKey="id"
+        rowKey="taisanId"
         loading={loading}
       />
     </div>

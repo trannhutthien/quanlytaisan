@@ -1,16 +1,21 @@
 package com.tvu.quanlytaisan.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.tvu.quanlytaisan.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "donvi")
 @Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class DonVi {
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+public class DonVi extends BaseEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,5 +30,6 @@ public class DonVi {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "donvicha_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "donviCha"})
     private DonVi donviCha;
 }

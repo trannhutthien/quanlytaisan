@@ -1,0 +1,9 @@
+-- Thêm cột created_at và updated_at vào bảng donvi
+ALTER TABLE donvi
+ADD COLUMN created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ADD COLUMN updated_at DATETIME NULL ON UPDATE CURRENT_TIMESTAMP;
+
+-- Thêm cột created_at và updated_at vào bảng vitri
+ALTER TABLE vitri
+ADD COLUMN created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ADD COLUMN updated_at DATETIME NULL ON UPDATE CURRENT_TIMESTAMP;

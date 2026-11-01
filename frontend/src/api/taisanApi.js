@@ -1,13 +1,29 @@
 import axiosClient from './axiosClient'
 
-const taisanApi = {
-  getAll: (params) => axiosClient.get('/taisan', { params }),
-  getById: (id) => axiosClient.get(`/taisan/${id}`),
-  create: (data) => axiosClient.post('/taisan', data),
-  update: (id, data) => axiosClient.put(`/taisan/${id}`, data),
-  delete: (id) => axiosClient.delete(`/taisan/${id}`),
-  getQrCode: (id) => axiosClient.get(`/taisan/${id}/qrcode`, { responseType: 'blob' }),
-  getLichSu: (id) => axiosClient.get(`/taisan/${id}/lichsu`),
+const taiSanApi = {
+  // Lay tat ca tai san
+  getAll: () => axiosClient.get('/tai-san'),
+  
+  // Lay tai san theo ID
+  getById: (id) => axiosClient.get(`/tai-san/${id}`),
+  
+  // Lay tai san theo ma
+  getByMa: (mataisan) => axiosClient.get(`/tai-san/ma/${mataisan}`),
+  
+  // Tim kiem tai san
+  search: (keyword) => axiosClient.get('/tai-san/search', { params: { keyword } }),
+  
+  // Lay tai san theo loai
+  getByLoai: (loaitaisanId) => axiosClient.get(`/tai-san/loai/${loaitaisanId}`),
+  
+  // Tao tai san moi
+  create: (data) => axiosClient.post('/tai-san', data),
+  
+  // Cap nhat tai san
+  update: (id, data) => axiosClient.put(`/tai-san/${id}`, data),
+  
+  // Xoa tai san
+  delete: (id) => axiosClient.delete(`/tai-san/${id}`),
 }
 
-export default taisanApi
+export default taiSanApi

@@ -58,27 +58,39 @@ export const TRANG_THAI_XU_LY_LABEL = {
 }
 
 export const KET_QUA_KIEM_KE = {
-  TIM_THAY: 'TIM_THAY',
-  KHONG_TIM_THAY: 'KHONG_TIM_THAY',
-  SAI_VI_TRI: 'SAI_VI_TRI',
+  CHUAKIEM: 'CHUAKIEM',
+  CO: 'CO',
+  THIEU: 'THIEU',
+  LECHVITRI: 'LECHVITRI',
 }
 
 export const KET_QUA_KIEM_KE_LABEL = {
-  TIM_THAY: 'Tìm thấy',
-  KHONG_TIM_THAY: 'Không tìm thấy',
-  SAI_VI_TRI: 'Sai vị trí',
+  CHUAKIEM: 'Chưa kiểm',
+  CO: 'Có - Đúng vị trí',
+  THIEU: 'Thiếu',
+  LECHVITRI: 'Lệch vị trí',
+}
+
+export const KET_QUA_KIEM_KE_COLOR = {
+  CHUAKIEM: 'default',
+  CO: 'success',
+  THIEU: 'error',
+  LECHVITRI: 'warning',
 }
 
 export const TRANG_THAI_DOT_KIEM_KE = {
-  DANG_KIEM_KE: 'DANG_KIEM_KE',
-  HOAN_THANH: 'HOAN_THANH',
-  HUY: 'HUY',
+  DANGMO: 'DANGMO',
+  DADONG: 'DADONG',
 }
 
 export const TRANG_THAI_DOT_KIEM_KE_LABEL = {
-  DANG_KIEM_KE: 'Đang kiểm kê',
-  HOAN_THANH: 'Hoàn thành',
-  HUY: 'Hủy',
+  DANGMO: 'Đang mở',
+  DADONG: 'Đã đóng',
+}
+
+export const TRANG_THAI_DOT_KIEM_KE_COLOR = {
+  DANGMO: 'processing',
+  DADONG: 'success',
 }
 
 export const VAI_TRO = {

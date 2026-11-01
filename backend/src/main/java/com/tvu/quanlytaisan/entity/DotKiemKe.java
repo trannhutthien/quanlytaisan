@@ -1,18 +1,21 @@
 package com.tvu.quanlytaisan.entity;
 
+import com.tvu.quanlytaisan.entity.base.BaseEntity;
 import com.tvu.quanlytaisan.enums.TrangThaiDotKiemKe;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "dotkiemke")
 @Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class DotKiemKe {
+public class DotKiemKe extends BaseEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

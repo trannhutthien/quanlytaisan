@@ -1,16 +1,19 @@
 package com.tvu.quanlytaisan.entity;
 
+import com.tvu.quanlytaisan.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "nguoidung")
 @Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class NguoiDung {
+public class NguoiDung extends BaseEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,9 +32,9 @@ public class NguoiDung {
     @Column(name = "email", length = 100, unique = true)
     private String email;
     
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "vaitro_id", nullable = false)
-    private VaiTro vaitro;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "vaitro", length = 20, nullable = false)
+    private com.tvu.quanlytaisan.enums.VaiTro vaitro;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "donvi_id")

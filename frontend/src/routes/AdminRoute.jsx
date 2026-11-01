@@ -17,7 +17,7 @@ const AdminRoute = ({ children }) => {
     return <Navigate to="/dangnhap" replace />
   }
 
-  if (user.vaiTro !== 'ADMIN') {
+  if (user.vaitro !== 'ADMIN') {
     return <Navigate to="/" replace />
   }
 

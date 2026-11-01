@@ -1,14 +1,22 @@
 import axiosClient from './axiosClient'
 
 const kiemkeApi = {
-  getDotKiemKe: (params) => axiosClient.get('/kiemke', { params }),
-  getById: (id) => axiosClient.get(`/kiemke/${id}`),
-  createDot: (data) => axiosClient.post('/kiemke', data),
-  updateDot: (id, data) => axiosClient.put(`/kiemke/${id}`, data),
-  getChiTiet: (dotId) => axiosClient.get(`/kiemke/${dotId}/chitiet`),
-  saveKetQua: (dotId, taisanId, ketQua) => 
-    axiosClient.post(`/kiemke/${dotId}/chitiet`, { taisanId, ketQua }),
-  closeDot: (id) => axiosClient.post(`/kiemke/${id}/close`),
+  // Quản lý đợt kiểm kê
+  createDotKiemKe: (data) => axiosClient.post('/kiem-ke/dot-kiem-ke', data),
+  
+  getAllDotKiemKe: (trangthai) => {
+    const params = trangthai ? { trangthai } : {}
+    return axiosClient.get('/kiem-ke/dot-kiem-ke', { params })
+  },
+  
+  getDotKiemKeById: (id) => axiosClient.get(`/kiem-ke/dot-kiem-ke/${id}`),
+  
+  getChiTietKiemKe: (id) => axiosClient.get(`/kiem-ke/dot-kiem-ke/${id}/chi-tiet`),
+  
+  dongDotKiemKe: (id) => axiosClient.put(`/kiem-ke/dot-kiem-ke/${id}/dong`),
+  
+  // Kiểm tra tài sản
+  kiemTraTaiSan: (data) => axiosClient.post('/kiem-ke/kiem-tra', data),
 }
 
 export default kiemkeApi

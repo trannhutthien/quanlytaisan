@@ -171,6 +171,38 @@ INSERT INTO trangthaitaisan (matrangthai, tentrangthai) VALUES
     ('MAINTENANCE', 'Đang bảo trì'),
     ('BROKEN',      'Hư hỏng');
 
+-- Dữ liệu mẫu cho Đơn vị
+INSERT INTO donvi (madonvi, tendonvi, donvicha_id) VALUES
+    ('DV001', 'Phòng Hành chính', NULL),
+    ('DV002', 'Phòng Kế toán', NULL),
+    ('DV003', 'Phòng Kỹ thuật', NULL),
+    ('DV004', 'Phòng Nhân sự', NULL),
+    ('DV005', 'Kho tổng', NULL);
+
+-- Dữ liệu mẫu cho Vị trí
+INSERT INTO vitri (mavitri, tenvitri, donvi_id) VALUES
+    ('VT001', 'Phòng 101', 1),
+    ('VT002', 'Phòng 102', 1),
+    ('VT003', 'Phòng 201', 2),
+    ('VT004', 'Phòng 202', 2),
+    ('VT005', 'Phòng 301', 3),
+    ('VT006', 'Phòng 302', 3),
+    ('VT007', 'Khu vực A', 5),
+    ('VT008', 'Khu vực B', 5);
+
+-- Dữ liệu mẫu cho Loại tài sản
+INSERT INTO loaitaisan (tenloai) VALUES
+    ('Máy tính'),
+    ('Bàn ghế'),
+    ('Điều hòa'),
+    ('Máy in'),
+    ('Tủ tài liệu'),
+    ('Điện thoại'),
+    ('Máy chiếu'),
+    ('Xe ô tô'),
+    ('Xe máy'),
+    ('Thiết bị mạng');
+
 -- 9. VIEW
 CREATE VIEW thongketheotrangthai AS
 SELECT tt.matrangthai, tt.tentrangthai, COUNT(ts.taisan_id) AS soluong

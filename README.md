@@ -34,9 +34,11 @@ Hệ thống quản lý tài sản sử dụng mã QR để tra cứu, kiểm k�
 ### Yêu cầu
 
 - **Node.js** 20 LTS hoặc cao hơn
-- **Java** 17 hoặc cao hơn
-- **Maven** 3.8+
+- **Java** 17 (LTS - Khuyến nghị, **BẮT BUỘC dùng Java 17**, không dùng Java 25)
+- **Maven** 3.8+ (hoặc dùng Maven Wrapper `mvnw.cmd` có sẵn)
 - **MySQL** 8.0+
+
+> ⚠️ **LƯU Ý JAVA:** Dự án sử dụng Lombok và Spring Boot 3.3.5, **YÊU CẦU Java 17**. Nếu bạn đang dùng Java 25 sẽ gặp lỗi biên dịch. Xem hướng dẫn cài đặt Java 17 tại [HUONG_DAN_SUA_LOI_LOMBOK.md](HUONG_DAN_SUA_LOI_LOMBOK.md)
 
 ### 1. Setup Database
 
@@ -54,23 +56,31 @@ mysql -u root -p quanlytaisanqr < backend/src/main/resources/db/quanlytaisanqr_g
 ```bash
 cd backend
 
-# Copy file config mẫu (nếu có)
+# Kiểm tra Java version (phải là Java 17)
+java -version
+
+# Nếu thấy Java 25, xem hướng dẫn đổi về Java 17: HUONG_DAN_SUA_LOI_LOMBOK.md
+
+# Copy file config mẫu (nếu cần)
 # cp src/main/resources/application-dev.yml.example src/main/resources/application-dev.yml
 
-# Cấu hình database trong application-dev.yml:
+# Cấu hình database trong application.yml hoặc application-dev.yml:
 # spring.datasource.url=jdbc:mysql://localhost:3306/quanlytaisanqr
-# spring.datasource.username=your_username
+# spring.datasource.username=root
 # spring.datasource.password=your_password
 
-# Build và chạy
-mvn clean install
-mvn spring-boot:run
+# Build và chạy bằng Maven Wrapper (khuyến nghị)
+.\mvnw.cmd clean install -DskipTests
+.\mvnw.cmd spring-boot:run
 
-# Hoặc chạy file JAR
-java -jar target/quanlytaisan-0.0.1-SNAPSHOT.jar
+# Hoặc dùng Maven nếu đã cài
+mvn clean install -DskipTests
+mvn spring-boot:run
 ```
 
-Backend sẽ chạy tại: `http://localhost:8080`
+Backend sẽ chạy tại: `http://localhost:8080/api`
+
+**API Documentation (Swagger):** `http://localhost:8080/api/swagger-ui.html`
 
 ### 3. Frontend Setup
 
@@ -94,17 +104,31 @@ Frontend sẽ chạy tại: `http://localhost:5173`
 
 ## Tài khoản mặc định
 
-Sau khi import database, sử dụng tài khoản:
+Sau khi import database và khởi động backend, hệ thống tự động tạo 2 tài khoản mặc định:
 
-- **Admin**: 
-  - Username: `admin`
-  - Password: `admin123`
+### 👤 Admin Account
+- **Username:** `admin`
+- **Password:** `admin123`
+- **Vai trò:** ADMIN (toàn quyền)
 
-- **User**: 
-  - Username: `user`
-  - Password: `user123`
+### 👤 User Account  
+- **Username:** `user`
+- **Password:** `user123`
+- **Vai trò:** USER (quyền hạn chế)
 
-⚠️ **LƯU Ý:** Đổi password mặc định sau khi cài đặt!
+⚠️ **LƯU Ý BẢO MẬT:** 
+- Đổi password ngay sau khi đăng nhập lần đầu!
+- Không sử dụng tài khoản mặc định trong môi trường production
+- Xem thêm hướng dẫn bảo mật tại [SECURITY.md](SECURITY.md)
+
+💡 **Cách đổi password:** Đăng nhập → Menu Profile → Đổi mật khẩu
+
+## Hướng dẫn chi tiết
+
+- 📖 **Hướng dẫn chạy ứng dụng:** [HUONG_DAN_CHAY_UNG_DUNG.md](HUONG_DAN_CHAY_UNG_DUNG.md)
+- 🔧 **Hướng dẫn sửa lỗi Java/Lombok:** [HUONG_DAN_SUA_LOI_LOMBOK.md](HUONG_DAN_SUA_LOI_LOMBOK.md)
+- 🔒 **Hướng dẫn bảo mật:** [SECURITY.md](SECURITY.md)
+- 📋 **Kế hoạch phát triển:** [docx/Danh sách xây dựng chức năng.md](docx/Danh%20sách%20xây%20dựng%20chức%20năng%20–%20Hệ%20thống%20quản%20lý%20tài%20sản%20bằng%20mã%20QR.md)
 
 ## Tính năng chính
 

@@ -11,8 +11,13 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem('token')
     if (token) {
       authApi.getCurrentUser()
-        .then((data) => setUser(data))
-        .catch(() => localStorage.removeItem('token'))
+        .then((response) => {
+          // Backend trả về ApiResponse, data nằm trong response.data
+          setUser(response.data)
+        })
+        .catch(() => {
+          localStorage.removeItem('token')
+        })
         .finally(() => setLoading(false))
     } else {
       setLoading(false)
@@ -20,10 +25,12 @@ export const AuthProvider = ({ children }) => {
   }, [])
 
   const login = async (credentials) => {
-    const data = await authApi.login(credentials)
-    localStorage.setItem('token', data.token)
-    setUser(data.user)
-    return data
+    const response = await authApi.login(credentials)
+    // response.data chứa {token, nguoidungId, tendangnhap, ...}
+    const { token, ...userData } = response.data
+    localStorage.setItem('token', token)
+    setUser(userData)
+    return response
   }
 
   const logout = () => {
