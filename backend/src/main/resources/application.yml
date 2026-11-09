@@ -45,7 +45,7 @@ jwt:
 app:
   cors:
     # Nhiều origin cách nhau bằng dấu phẩy, chỉ gồm tên miền, không có dấu / cuối
-    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173,http://192.168.2.11:5173,https://thanhdu-create.github.io}
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173,http://192.168.2.11:5173,https://trannhutthien.github.io}
   qr:
     # Mã QR trỏ tới trang chi tiết tài sản, ví dụ https://TENBAN.github.io/TEN-REPO/#/assets/
     base-url: "${QR_BASE_URL:http://localhost:5173/#/assets/}"
