@@ -1,809 +1,462 @@
 # Hệ thống Quản lý Tài sản bằng mã QR
 
+[![Deploy frontend](https://github.com/trannhutthien/quanlytaisan/actions/workflows/deploy.yml/badge.svg)](https://github.com/trannhutthien/quanlytaisan/actions/workflows/deploy.yml)
+
 Hệ thống quản lý tài sản toàn diện sử dụng mã QR để tra cứu, kiểm kê, bảo trì và luân chuyển tài sản. Hệ thống hỗ trợ quét QR bằng camera điện thoại, theo dõi lịch sử tài sản, quản lý bảo trì định kỳ và kiểm kê tài sản.
 
-##pas của tidb
-pass : 1ha5neG6WLI2o76W
-host : gateway01.ap-southeast-1.prod.aws.tidbcloud.com
-port : 4000
-usernae : wvdpCa871TJs4DR.root
+## 🌐 Chạy trực tuyến
+
+| Thành phần | Địa chỉ |
+|------------|---------|
+| **Frontend** | https://trannhutthien.github.io/quanlytaisan/ |
+| **Backend API** | https://quanlytaisan-6hhw.onrender.com/api |
+| **Health check** | https://quanlytaisan-6hhw.onrender.com/api/health |
+| **Mã nguồn** | https://github.com/trannhutthien/quanlytaisan |
+| **Cơ sở dữ liệu** | TiDB Cloud Serverless (MySQL 8, region Singapore) |
+
+> ⏱️ Backend chạy trên gói **Free của Render** nên tự ngủ sau 15 phút không có truy cập. Lần mở đầu tiên có thể chậm khoảng 1 phút để khởi động lại.
 
 ## 📋 Mục lục
 
-- [Yêu cầu hệ thống](#yêu-cầu-hệ-thống)
-- [Thư viện và công nghệ](#thư-viện-và-công-nghệ)
-- [Cài đặt và chạy dự án](#cài-đặt-và-chạy-dự-án)
-- [Cấu trúc dự án](#cấu-trúc-dự-án)
-- [Chức năng của hệ thống](#chức-năng-của-hệ-thống)
-- [Tài khoản mặc định](#tài-khoản-mặc-định)
-- [API Documentation](#api-documentation)
-- [Testing](#testing)
-- [Deployment](#deployment)
+- [Yêu cầu hệ thống](#-yêu-cầu-hệ-thống)
+- [Thư viện và công nghệ](#-thư-viện-và-công-nghệ)
+- [Cài đặt và chạy local](#-cài-đặt-và-chạy-local)
+- [Cấu trúc dự án](#-cấu-trúc-dự-án)
+- [Chức năng của hệ thống](#-chức-năng-của-hệ-thống)
+- [Tài khoản mặc định](#-tài-khoản-mặc-định)
+- [API Documentation](#-api-documentation)
+- [Testing](#-testing)
+- [Triển khai](#-triển-khai)
+- [Bảo mật](#-bảo-mật)
 
 ## 🖥️ Yêu cầu hệ thống
 
-### Phần mềm cần cài đặt trên máy:
+### Phần mềm cần cài đặt trên máy
 
-| Phần mềm | Phiên bản yêu cầu | Mục đích | Link tải |
-|----------|------------------|----------|----------|
-| **Node.js** | 18.x hoặc 20.x LTS | Chạy frontend React | [nodejs.org](https://nodejs.org/) |
-| **Java JDK** | 17 (LTS) **BẮT BUỘC** | Chạy backend Spring Boot | [Oracle JDK](https://www.oracle.com/java/technologies/downloads/#java17) |
-| **Maven** | 3.8+ | Build backend (hoặc dùng Maven Wrapper có sẵn) | [maven.apache.org](https://maven.apache.org/download.cgi) |
-| **MySQL** | 8.0+ | Cơ sở dữ liệu | [mysql.com](https://dev.mysql.com/downloads/installer/) |
-| **Git** | Mới nhất | Quản lý source code | [git-scm.com](https://git-scm.com/downloads) |
+| Phần mềm | Phiên bản | Mục đích |
+|----------|-----------|----------|
+| **Node.js** | 18.x hoặc 20.x LTS | Chạy frontend React |
+| **Java JDK** | 17 (LTS) **BẮT BUỘC** | Chạy backend Spring Boot |
+| **Maven** | 3.8+ | Build backend (hoặc dùng Maven Wrapper có sẵn) |
+| **MySQL** | 8.0+ | Cơ sở dữ liệu khi chạy local |
+| **Git** | Mới nhất | Quản lý source code |
+| **Docker** | Tùy chọn | Build/chạy backend bằng container |
 
-> ⚠️ **QUAN TRỌNG - Java Version:** 
-> - Dự án **YÊU CẦU Java 17** (không dùng Java 25 hoặc phiên bản khác)
-> - Sử dụng Lombok và Spring Boot 3.3.5 chỉ tương thích với Java 17
-> - Kiểm tra version: `java -version`
-> - Nếu gặp lỗi Lombok, xem: [HUONG_DAN_SUA_LOI_LOMBOK.md](HUONG_DAN_SUA_LOI_LOMBOK.md)
+> ⚠️ **Java 17 là bắt buộc.** Spring Boot 3.3.5 và Lombok trong dự án chỉ chạy ổn định với Java 17. Kiểm tra bằng `java -version`.
 
 ## 🛠️ Thư viện và công nghệ
 
-### Backend (Spring Boot)
+### Backend
 
-#### Core Framework
-- **Spring Boot**: 3.3.5
-- **Spring Security**: JWT Authentication & Authorization
-- **Spring Data JPA**: ORM và database access
-- **Spring Validation**: Validation dữ liệu
-- **Hibernate**: JPA implementation
+| Nhóm | Công nghệ |
+|------|-----------|
+| Framework | Spring Boot 3.3.5, Java 17 |
+| Bảo mật | Spring Security + JWT (JJWT 0.12.6) |
+| Dữ liệu | Spring Data JPA, Hibernate, MySQL Connector/J 8.2.0 |
+| Validation | Spring Validation (Jakarta Bean Validation) |
+| Hỗ trợ code | Lombok 1.18.36 |
+| QR Code | ZXing 3.5.3 (core + javase) |
+| Xuất báo cáo | Apache POI 5.3.0 (Excel) |
+| API docs | Springdoc OpenAPI 2.6.0 (Swagger UI) |
+| Build | Maven, Spring Boot Maven Plugin |
+| Đóng gói | Docker multi-stage (Maven 3.9 + Eclipse Temurin JRE 17) |
 
-#### Database
-- **MySQL Connector**: `mysql-connector-j` (runtime)
-- **Database**: MySQL 8.x với charset UTF-8 (utf8mb4)
+### Frontend
 
-#### Libraries
-| Thư viện | Version | Mục đích |
-|----------|---------|----------|
-| **Lombok** | 1.18.36 | Giảm boilerplate code (getter/setter, builder) |
-| **JJWT** | 0.12.6 | Xử lý JWT tokens (api, impl, jackson) |
-| **ZXing** | 3.5.3 | Sinh mã QR code (core, javase) |
-| **Springdoc OpenAPI** | 2.6.0 | Tự động sinh API documentation (Swagger UI) |
-| **Apache POI** | 5.3.0 | Xuất báo cáo Excel |
-| **Spring Boot DevTools** | - | Hot reload khi development (optional) |
+| Nhóm | Công nghệ |
+|------|-----------|
+| Framework | React 18.3.1, Vite 5.4.2 |
+| UI | Ant Design 5.20.0, @ant-design/icons 5.4.0 |
+| Routing | React Router DOM 6.26.0 (**HashRouter** để tương thích GitHub Pages) |
+| HTTP | Axios 1.7.5 (JWT interceptor) |
+| Quét QR | html5-qrcode 2.3.8 (camera/WebRTC) |
+| Biểu đồ | Recharts 2.12.7 |
+| Ngày tháng | DayJS 1.11.12 |
+| Responsive | Ant Design Grid breakpoints, dạng card trên điện thoại và bảng trên tablet/desktop |
 
-#### Testing
-- **Spring Boot Test**: Unit & Integration testing
-- **Spring Security Test**: Security testing
+### Hạ tầng và triển khai
 
-### Frontend (React)
+| Thành phần | Dịch vụ / công nghệ |
+|------------|---------------------|
+| Mã nguồn | GitHub – `trannhutthien/quanlytaisan` |
+| Hosting frontend | **GitHub Pages** tại `/quanlytaisan/` |
+| CI/CD frontend | **GitHub Actions** (`.github/workflows/deploy.yml`), build với biến `VITE_API_URL` |
+| Hosting backend | **Render** – Web Service dạng Docker, gói Free, region Singapore |
+| Cơ sở dữ liệu | **TiDB Cloud Serverless** (tương thích MySQL 8, cổng 4000, SSL) |
+| Cấu hình | Biến môi trường trên Render, không hardcode bí mật trong code |
+| Health check | `GET /api/health` (public) dùng cho Render và giữ dịch vụ không ngủ |
+| Mã QR | Chứa URL `QR_BASE_URL + id` để quét là mở thẳng trang chi tiết tài sản |
 
-#### Core Framework
-- **React**: 18.3.1
-- **React DOM**: 18.3.1
-- **Vite**: 5.4.2 (Build tool, thay thế Create React App)
+### Biến môi trường backend
 
-#### UI & Components
-| Thư viện | Version | Mục đích |
-|----------|---------|----------|
-| **Ant Design (antd)** | 5.20.0 | UI component library (Table, Form, Modal, etc.) |
-| **@ant-design/icons** | 5.4.0 | Icon library của Ant Design |
+| Biến | Ý nghĩa | Mặc định khi chạy local |
+|------|---------|--------------------------|
+| `PORT` | Cổng server (Render cấp tự động) | `8080` |
+| `DB_URL` | JDBC URL tới MySQL/TiDB | MySQL `localhost:3306` |
+| `DB_USERNAME` | Tài khoản database | `root` |
+| `DB_PASSWORD` | Mật khẩu database | rỗng |
+| `DDL_AUTO` | `update` lần đầu, sau đó `validate` | `none` |
+| `JWT_SECRET` | Khóa ký JWT (tối thiểu 32 ký tự) | giá trị mẫu |
+| `JWT_EXPIRATION` | Thời hạn token (ms) | `86400000` |
+| `CORS_ALLOWED_ORIGINS` | Origin frontend được phép, cách nhau bởi dấu phẩy | `localhost:5173`, ... |
+| `QR_BASE_URL` | Tiền tố URL ghi vào mã QR | `http://localhost:5173/#/assets/` |
 
-#### Routing & HTTP
-| Thư viện | Version | Mục đích |
-|----------|---------|----------|
-| **React Router DOM** | 6.26.0 | Client-side routing |
-| **Axios** | 1.7.5 | HTTP client cho API calls |
-
-#### QR Code & Charts
-| Thư viện | Version | Mục đích |
-|----------|---------|----------|
-| **html5-qrcode** | 2.3.8 | Quét mã QR bằng camera (WebRTC) |
-| **Recharts** | 2.12.7 | Vẽ biểu đồ thống kê |
-| **DayJS** | 1.11.12 | Xử lý ngày tháng (thay thế Moment.js) |
-
-#### Build & Development
-- **@vitejs/plugin-react**: 4.3.1 (Vite plugin cho React)
-
-## 🚀 Cài đặt và chạy dự án
+## 🚀 Cài đặt và chạy local
 
 ### Bước 1: Clone repository
 
 ```bash
-git clone <repository-url>
-cd <project-folder>
+git clone https://github.com/trannhutthien/quanlytaisan.git
+cd quanlytaisan
 ```
 
-### Bước 2: Setup Database
+### Bước 2: Chuẩn bị database
 
-#### 2.1. Tạo database MySQL
+Chạy MySQL local rồi tạo database và import dữ liệu mẫu:
 
 ```bash
-# Đăng nhập MySQL
 mysql -u root -p
+```
 
-# Tạo database với charset UTF-8
+```sql
 CREATE DATABASE quanlytaisanqr CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
-# Thoát MySQL
-exit;
 ```
 
-#### 2.2. Import schema và dữ liệu mẫu
-
-**📁 Vị trí file SQL:** `backend/src/main/resources/db/quanlytaisanqr_gon.sql`
-
 ```bash
-# Import từ thư mục gốc dự án
 mysql -u root -p quanlytaisanqr < backend/src/main/resources/db/quanlytaisanqr_gon.sql
-
-# Hoặc từ thư mục backend
-cd backend
-mysql -u root -p quanlytaisanqr < src/main/resources/db/quanlytaisanqr_gon.sql
 ```
 
-> 💡 **Lưu ý:** File SQL này chứa:
-> - Schema đầy đủ (13 tables)
-> - Dữ liệu mẫu cho danh mục (Đơn vị, Vị trí, Loại tài sản)
-> - 2 tài khoản người dùng mặc định (admin, user)
+File SQL chứa schema đầy đủ, dữ liệu danh mục mẫu và 2 tài khoản mặc định.
 
-### Bước 3: Backend Setup
+> Nếu muốn dùng TiDB Cloud khi chạy local, tạo file `backend/src/main/resources/application-tidb.yml` (đã nằm trong `.gitignore`) hoặc đặt các biến `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` trong môi trường chạy.
+
+### Bước 3: Chạy backend
 
 ```bash
 cd backend
-```
 
-#### 3.1. Kiểm tra Java version
-
-```bash
-java -version
-# Phải hiển thị: java version "17.x.x"
-```
-
-> ⚠️ Nếu thấy Java 25 hoặc version khác, cần đổi về Java 17. Xem hướng dẫn: [HUONG_DAN_SUA_LOI_LOMBOK.md](HUONG_DAN_SUA_LOI_LOMBOK.md)
-
-#### 3.2. Cấu hình database
-
-Mở file `backend/src/main/resources/application.yml` và cập nhật:
-
-```yaml
-spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/quanlytaisanqr?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Ho_Chi_Minh
-    username: root           # Thay bằng username MySQL của bạn
-    password: your_password  # Thay bằng password MySQL của bạn
-```
-
-> 💡 **Tip:** Để bảo mật, tạo file `application-dev.yml` hoặc `application-local.yml` (đã có trong `.gitignore`) để override cấu hình local.
-
-#### 3.3. Build và chạy backend
-
-**Cách 1: Dùng Maven Wrapper (khuyến nghị - không cần cài Maven)**
-
-```bash
 # Windows
-.\mvnw.cmd clean install -DskipTests
 .\mvnw.cmd spring-boot:run
 
 # Linux/Mac
-./mvnw clean install -DskipTests
 ./mvnw spring-boot:run
 ```
 
-**Cách 2: Dùng Maven đã cài**
+Backend chạy tại `http://localhost:8080/api`.
+
+Kiểm tra nhanh:
 
 ```bash
-mvn clean install -DskipTests
-mvn spring-boot:run
+curl http://localhost:8080/api/health
+# OK
 ```
 
-✅ **Backend chạy tại:** `http://localhost:8080/api`
-
-#### 3.4. Kiểm tra backend
-
-Mở browser và truy cập:
-- API Health: `http://localhost:8080/api/test/hello`
-- Swagger UI: `http://localhost:8080/api/swagger-ui.html`
-
-### Bước 4: Frontend Setup
-
-Mở terminal mới (giữ backend chạy):
+### Bước 4: Chạy frontend
 
 ```bash
 cd frontend
-```
-
-#### 4.1. Cài đặt dependencies
-
-```bash
+cp .env.example .env      # Windows: copy .env.example .env
 npm install
-```
-
-> ⏱️ Lần đầu cài sẽ mất ~2-3 phút tùy tốc độ mạng
-
-#### 4.2. Cấu hình API URL
-
-File `.env` đã có sẵn, kiểm tra nội dung:
-
-```bash
-# File: frontend/.env
-VITE_API_URL=http://localhost:8080/api
-```
-
-> 💡 Nếu backend chạy ở port khác, thay đổi URL này
-
-#### 4.3. Chạy development server
-
-```bash
 npm run dev
 ```
 
-✅ **Frontend chạy tại:** `http://localhost:5173`
+File `frontend/.env`:
 
-#### 4.4. Kiểm tra frontend
+```env
+VITE_API_URL=http://localhost:8080/api
+```
 
-- Mở browser: `http://localhost:5173`
-- Trang đăng nhập sẽ xuất hiện
-- Đăng nhập bằng tài khoản mặc định (xem phần [Tài khoản mặc định](#tài-khoản-mặc-định))
+Frontend chạy tại `http://localhost:5173/quanlytaisan/` (Vite base path `/quanlytaisan/`).
 
-### 🎉 Hoàn tất!
-
-Bây giờ bạn có:
-- ✅ Backend API chạy tại `http://localhost:8080/api`
-- ✅ Frontend chạy tại `http://localhost:5173`
-- ✅ Database MySQL với dữ liệu mẫu
-- ✅ 2 tài khoản test (admin/user)
+Đăng nhập bằng tài khoản mặc định ở phần [Tài khoản mặc định](#-tài-khoản-mặc-định).
 
 ## 📁 Cấu trúc dự án
 
 ```
-quanlytaisanqr/
-├── backend/                              # Spring Boot Backend
+quanlytaisan/
+├── .github/
+│   └── workflows/
+│       └── deploy.yml                 # CI/CD đưa frontend lên GitHub Pages
+├── backend/                           # Spring Boot Backend
+│   ├── Dockerfile                     # Build Maven + chạy JRE 17
+│   ├── .dockerignore
+│   ├── pom.xml
+│   ├── mvnw, mvnw.cmd
+│   └── src/main/
+│       ├── java/com/tvu/quanlytaisan/
+│       │   ├── config/                # Security, CORS, DataInitializer
+│       │   ├── controller/            # REST Controllers + HealthController
+│       │   ├── dto/                   # request/ + response/
+│       │   ├── entity/                # JPA Entities
+│       │   ├── enums/
+│       │   ├── exception/             # Global Exception Handler
+│       │   ├── repository/            # Spring Data JPA
+│       │   ├── security/              # JWT Service, Auth Filter
+│       │   └── service/               # Business Logic, QRCodeService
+│       └── resources/
+│           ├── application.yml        # Cấu hình đọc từ biến môi trường
+│           ├── application-*.yml.example
+│           └── db/                    # Schema + dữ liệu mẫu
+├── frontend/                          # React Frontend
 │   ├── src/
-│   │   ├── main/
-│   │   │   ├── java/com/tvu/quanlytaisan/
-│   │   │   │   ├── config/              # Cấu hình (Security, CORS, Data Initializer)
-│   │   │   │   ├── controller/          # 11 REST Controllers
-│   │   │   │   │   ├── AuthController.java          # Đăng nhập, JWT
-│   │   │   │   │   ├── TaiSanController.java        # CRUD tài sản, QR code
-│   │   │   │   │   ├── LuanChuyenController.java    # Bàn giao, thu hồi, điều chuyển
-│   │   │   │   │   ├── BaoTriController.java        # Bảo trì, sửa chữa
-│   │   │   │   │   ├── KiemKeController.java        # Kiểm kê định kỳ
-│   │   │   │   │   ├── ThongKeController.java       # Dashboard, thống kê
-│   │   │   │   │   ├── DonViController.java         # Quản lý đơn vị
-│   │   │   │   │   ├── ViTriController.java         # Quản lý vị trí
-│   │   │   │   │   ├── LoaiTaiSanController.java    # Quản lý loại tài sản
-│   │   │   │   │   ├── TrangThaiTaiSanController.java
-│   │   │   │   │   └── NguoiDungController.java     # Quản lý người dùng (Admin)
-│   │   │   │   ├── dto/                 # Data Transfer Objects
-│   │   │   │   │   ├── request/         # 11 Request DTOs
-│   │   │   │   │   └── response/        # 9 Response DTOs
-│   │   │   │   ├── entity/              # 13 JPA Entities
-│   │   │   │   │   ├── base/BaseEntity.java         # Base entity với timestamp
-│   │   │   │   │   ├── TaiSan.java                  # Tài sản
-│   │   │   │   │   ├── LuanChuyen.java              # Luân chuyển
-│   │   │   │   │   ├── BaoTri.java                  # Bảo trì
-│   │   │   │   │   ├── DotKiemKe.java, ChiTietKiemKe.java
-│   │   │   │   │   ├── DonVi.java, ViTri.java, LoaiTaiSan.java
-│   │   │   │   │   ├── NguoiDung.java               # User
-│   │   │   │   │   └── LichSu*.java                 # Lịch sử
-│   │   │   │   ├── enums/               # 7 Java Enums
-│   │   │   │   ├── repository/          # Spring Data JPA Repositories
-│   │   │   │   ├── service/             # Business Logic Layer
-│   │   │   │   ├── security/            # JWT Service, Auth Filter
-│   │   │   │   ├── exception/           # Global Exception Handler
-│   │   │   │   └── util/                # QR Code Generator
-│   │   │   └── resources/
-│   │   │       ├── application.yml                  # Main config
-│   │   │       ├── application.yml.example          # Config template
-│   │   │       ├── application-dev.yml              # Dev config
-│   │   │       └── db/
-│   │   │           └── quanlytaisanqr_gon.sql      # ⭐ DATABASE SCHEMA
-│   │   └── test/                        # Unit tests
-│   ├── pom.xml                          # Maven dependencies
-│   ├── mvnw.cmd                         # Maven Wrapper (Windows)
-│   ├── mvnw                             # Maven Wrapper (Linux/Mac)
-│   └── README.md
-│
-├── frontend/                             # React Frontend
-│   ├── src/
-│   │   ├── api/                         # API clients (Axios)
-│   │   │   ├── authApi.js               # Authentication
-│   │   │   ├── taisanApi.js             # Tài sản APIs
-│   │   │   ├── luanchuyenApi.js         # Luân chuyển APIs
-│   │   │   ├── baotriApi.js             # Bảo trì APIs
-│   │   │   ├── kiemkeApi.js             # Kiểm kê APIs
-│   │   │   ├── nguoidungApi.js          # Người dùng APIs
-│   │   │   └── thongkeApi.js            # Thống kê APIs
-│   │   ├── components/                  # Shared components
-│   │   │   ├── QrScanner.jsx            # Quét QR bằng camera
-│   │   │   ├── QrImage.jsx              # Hiển thị & in QR code
-│   │   │   ├── StatusTag.jsx            # Tag trạng thái
-│   │   │   └── ConfirmDialog.jsx        # Dialog xác nhận
-│   │   ├── context/                     # React Contexts
-│   │   │   └── AuthContext.jsx          # Authentication state
-│   │   ├── hooks/                       # Custom hooks
-│   │   │   └── useAuth.js
-│   │   ├── layouts/                     # Layout components
-│   │   │   ├── MainLayout.jsx           # Layout chính với sidebar
-│   │   │   └── LoginLayout.jsx          # Layout trang login
-│   │   ├── pages/                       # Page components
-│   │   │   ├── dangnhap/                # Trang đăng nhập
-│   │   │   ├── dashboard/               # Dashboard & thống kê
-│   │   │   ├── taisan/                  # Quản lý tài sản
-│   │   │   ├── quetqr/                  # Quét QR
-│   │   │   ├── luanchuyen/              # Luân chuyển tài sản
-│   │   │   ├── kiemke/                  # Kiểm kê
-│   │   │   └── nguoidung/               # Quản lý người dùng
-│   │   ├── routes/                      # Route configuration
-│   │   │   └── AppRoutes.jsx
-│   │   ├── utils/                       # Utilities
-│   │   │   ├── axiosConfig.js           # Axios interceptors
-│   │   │   └── constants.js
-│   │   ├── App.jsx                      # Root component
-│   │   └── main.jsx                     # Entry point
-│   ├── public/                          # Static assets
-│   ├── index.html
-│   ├── vite.config.js                   # Vite configuration
-│   ├── package.json                     # NPM dependencies
-│   ├── .env                             # Environment variables
-│   ├── .env.example                     # Env template
-│   └── README.md
-│
-├── docx/                                # Tài liệu dự án
-│   └── Danh sách xây dựng chức năng.md
-├── .kiro/                               # Kiro specs & configs
-│   └── specs/                           # Feature specifications
-├── SECURITY.md                          # Hướng dẫn bảo mật
-├── HUONG_DAN_CHAY_UNG_DUNG.md          # Hướng dẫn chi tiết
-├── HUONG_DAN_SUA_LOI_LOMBOK.md         # Fix Java/Lombok errors
-├── .gitignore                           # Git ignore rules
-└── README.md                            # ⭐ File này
+│   │   ├── api/                       # Axios clients
+│   │   ├── components/                # QrScanner, QrImage, StatusTag, ...
+│   │   ├── context/                   # AuthContext
+│   │   ├── hooks/
+│   │   ├── layouts/                   # MainLayout, LoginLayout
+│   │   ├── pages/                     # dangnhap, dashboard, taisan, quetqr,
+│   │   │                              # luanchuyen, kiemke, admin, nguoidung
+│   │   ├── routes/AppRoutes.jsx
+│   │   └── utils/                     # constants, format, permissions
+│   ├── .env.example
+│   ├── vite.config.js                 # base: '/quanlytaisan/'
+│   └── package.json
+├── docx/                              # Tài liệu hướng dẫn và báo cáo
+└── README.md
 ```
 
 ## ✨ Chức năng của hệ thống
 
-### 1. 🔐 Xác thực và Phân quyền
-- **Đăng nhập JWT**: Authentication token-based với Spring Security
-- **2 vai trò người dùng**:
-  - **ADMIN**: Toàn quyền quản lý hệ thống
-  - **USER**: Xem tài sản, quét QR, báo hỏng
-- **Quản lý profile**: Đổi mật khẩu, xem thông tin cá nhân
+### 1. 🔐 Xác thực và phân quyền
+- Đăng nhập JWT, token lưu trong `localStorage`.
+- Hai vai trò: **ADMIN** (toàn quyền) và **USER** (xem tài sản, quét QR, báo hỏng).
+- Phân quyền theo từng trang/chức năng, đổi mật khẩu, xem thông tin cá nhân.
 
-### 2. 📦 Quản lý Tài sản
-- **CRUD tài sản**: Thêm, sửa, xóa, xem chi tiết tài sản
-- **Tìm kiếm & lọc**: Theo mã, tên, đơn vị, loại, trạng thái
-- **Sinh mã QR tự động**: Mỗi tài sản có QR code riêng
-- **In QR code**: In từng cái hoặc hàng loạt
-- **Lịch sử tài sản**: Theo dõi mọi thay đổi (trạng thái, vị trí, bảo trì)
-- **Upload hình ảnh**: Ảnh tài sản (tùy chọn)
+### 2. 📦 Quản lý tài sản
+- CRUD tài sản, tìm kiếm và lọc theo mã, tên, đơn vị, loại, trạng thái.
+- Sinh mã QR tự động, in QR từng cái hoặc hàng loạt.
+- Theo dõi lịch sử thay đổi trạng thái, vị trí, bảo trì.
 
 ### 3. 📱 Quét QR Code
-- **Quét bằng camera**: Sử dụng camera điện thoại/laptop
-- **Tra cứu nhanh**: Xem thông tin tài sản ngay lập tức
-- **Lịch sử quét**: Ghi lại thời gian và người quét
+- Quét bằng camera điện thoại/laptop.
+- Mã QR chứa URL trang chi tiết tài sản nên quét là mở đúng tài sản.
+- Ghi lại lịch sử quét.
 
-### 4. 🔄 Quản lý Luân chuyển
-- **Bàn giao tài sản**: Chuyển tài sản cho người khác
-- **Thu hồi tài sản**: Thu hồi về kho hoặc đơn vị
-- **Điều chuyển**: Chuyển tài sản giữa các vị trí/đơn vị
-- **Theo dõi lịch sử**: Xem toàn bộ quá trình luân chuyển
-- **Phê duyệt**: Xác nhận bàn giao/thu hồi
+### 4. 🔄 Luân chuyển tài sản
+- Bàn giao, thu hồi, điều chuyển giữa người dùng và đơn vị.
+- Hỗ trợ bên giao/bên nhận là người hoặc đơn vị, chọn vị trí cụ thể.
+- Theo dõi lịch sử và trạng thái phê duyệt.
 
-### 5. 🔧 Quản lý Bảo trì
-- **Báo hỏng**: Người dùng báo cáo tài sản hỏng hóc
-- **Đăng ký sửa chữa**: Lập phiếu sửa chữa
-- **Bảo trì định kỳ**: Lên lịch bảo trì theo chu kỳ
-- **Theo dõi chi phí**: Ghi nhận chi phí bảo trì
-- **Lịch sử bảo trì**: Xem toàn bộ lịch sử sửa chữa/bảo trì
-- **Thống kê bảo trì**: Báo cáo theo đơn vị, loại tài sản, thời gian
+### 5. 🔧 Quản lý bảo trì
+- Báo hỏng, lập phiếu sửa chữa, bảo trì định kỳ.
+- Theo dõi chi phí và lịch sử bảo trì.
+- Thống kê bảo trì theo đơn vị, loại tài sản và thời gian.
 
-### 6. ✅ Kiểm kê Tài sản
-- **Tạo đợt kiểm kê**: Lập kế hoạch kiểm kê định kỳ
-- **Phân công kiểm kê**: Giao nhiệm vụ cho từng người
-- **Ghi nhận kết quả**: Quét QR và xác nhận tài sản
-  - ✅ Đầy đủ (tài sản còn, đúng vị trí)
-  - ⚠️ Thiếu (không tìm thấy)
-  - 📍 Sai vị trí (tìm thấy nhưng sai chỗ)
-  - ➕ Thừa (tài sản không có trong danh sách)
-- **Báo cáo kiểm kê**: Tổng hợp kết quả, tỷ lệ đạt
+### 6. ✅ Kiểm kê tài sản
+- Tạo đợt kiểm kê, phân công người thực hiện.
+- Ghi nhận kết quả: đầy đủ, thiếu, sai vị trí, thừa.
+- Báo cáo tổng hợp và tỷ lệ đạt.
 
-### 7. 📊 Dashboard & Thống kê
-- **Tổng quan hệ thống**:
-  - Tổng số tài sản
-  - Tài sản theo trạng thái (Đang sử dụng, Hỏng, Bảo trì, Thanh lý)
-  - Tài sản theo đơn vị
-  - Tài sản theo loại
-- **Biểu đồ trực quan**: Pie chart, bar chart (Recharts)
-- **Thống kê bảo trì**: Số lượng, chi phí theo thời gian
-- **Thống kê kiểm kê**: Tỷ lệ đầy đủ/thiếu/sai vị trí
+### 7. 📊 Dashboard và thống kê
+- Tổng số tài sản, theo trạng thái, đơn vị, loại tài sản.
+- Biểu đồ trực quan (Recharts) và danh sách hoạt động gần đây.
+- Dashboard riêng cho ADMIN và USER.
 
-### 8. 📂 Quản lý Danh mục
-- **Đơn vị**: Quản lý các đơn vị/phòng ban
-- **Vị trí**: Quản lý vị trí lưu trữ tài sản
-- **Loại tài sản**: Phân loại tài sản (Máy tính, Bàn ghế, Xe cộ, v.v.)
-- **Trạng thái**: Các trạng thái tài sản có thể có
+### 8. 📂 Quản lý danh mục
+- Đơn vị, vị trí, loại tài sản, trạng thái tài sản.
 
-### 9. 👥 Quản lý Người dùng (Admin)
-- **CRUD người dùng**: Thêm, sửa, xóa tài khoản
-- **Phân quyền**: Gán vai trò ADMIN/USER
-- **Reset password**: Admin có thể reset mật khẩu cho user
-- **Vô hiệu hóa tài khoản**: Khóa tài khoản không cần xóa
+### 9. 👥 Quản lý người dùng (Admin)
+- CRUD tài khoản, gán vai trò và quyền theo trang.
+- Reset mật khẩu, khóa/mở khóa tài khoản.
 
 ### 10. 📄 Xuất báo cáo
-- **Xuất Excel**: Danh sách tài sản, báo cáo kiểm kê (Apache POI)
-- **In QR code**: In mã QR hàng loạt
-- **Báo cáo tùy chỉnh**: Lọc theo tiêu chí khác nhau
+- Xuất danh sách tài sản và báo cáo kiểm kê ra Excel (Apache POI).
+- In QR hàng loạt.
+
+### 11. 📐 Giao diện responsive
+- Điện thoại: danh sách dạng card, phân trang đơn giản, form/modal toàn chiều rộng.
+- Tablet và desktop: bảng dữ liệu đầy đủ, thao tác gom vào dropdown.
 
 ## 👤 Tài khoản mặc định
 
-Sau khi import database (`quanlytaisanqr_gon.sql`), hệ thống tự động có 2 tài khoản để test:
-
 | Vai trò | Username | Password | Quyền hạn |
 |---------|----------|----------|-----------|
-| **Admin** | `admin` | `admin123` | ✅ Toàn quyền: CRUD tài sản, người dùng, danh mục, phê duyệt |
-| **User** | `user` | `user123` | ⚠️ Hạn chế: Xem tài sản, quét QR, báo hỏng |
+| **Admin** | `admin` | `admin123` | Toàn quyền quản lý hệ thống |
+| **User** | `user` | `user123` | Xem tài sản, quét QR, báo hỏng |
 
-### 🔒 Lưu ý bảo mật
+> 🔒 Đổi mật khẩu ngay sau lần đăng nhập đầu tiên, đặc biệt khi chạy trên môi trường công khai.
 
-> ⚠️ **QUAN TRỌNG - ĐỌC KỸ TRƯỚC KHI SỬ DỤNG:**
-> 
-> 1. **Đổi password ngay** sau khi đăng nhập lần đầu!
-> 2. **KHÔNG dùng tài khoản mặc định** trong môi trường production
-> 3. **Đổi JWT secret key** trong `application.yml` trước khi deploy
-> 4. Xem chi tiết: [SECURITY.md](SECURITY.md)
+## 📡 API Documentation
 
-### 💡 Cách đổi password
+- Local: `http://localhost:8080/api`
+- Production: `https://quanlytaisan-6hhw.onrender.com/api`
+- Swagger UI (khi bật public trong `SecurityConfig`): `http://localhost:8080/api/swagger-ui.html`
 
-1. Đăng nhập với tài khoản mặc định
-2. Click vào avatar/tên người dùng ở góc phải
-3. Chọn "Đổi mật khẩu"
-4. Nhập mật khẩu cũ và mật khẩu mới
+### API endpoints chính
 
-## � API Documentation
-
-Sau khi chạy backend, truy cập **Swagger UI** để xem tài liệu API:
-
-```
-http://localhost:8080/api/swagger-ui.html
-```
-
-### API Endpoints chính
-
-| Module | Base Path | Mô tả |
+| Module | Base path | Mô tả |
 |--------|-----------|-------|
-| Authentication | `/api/auth` | Đăng nhập, lấy thông tin user |
+| Authentication | `/api/auth` | Đăng nhập, thông tin user, đổi mật khẩu |
 | Tài sản | `/api/tai-san` | CRUD, QR code, tìm kiếm |
 | Luân chuyển | `/api/luanchuyen` | Bàn giao, thu hồi, điều chuyển |
 | Bảo trì | `/api/bao-tri` | Báo hỏng, sửa chữa, thống kê |
 | Kiểm kê | `/api/kiem-ke` | Tạo đợt, ghi nhận kết quả |
-| Thống kê | `/api/thongke` | Dashboard data |
+| Thống kê | `/api/thongke` | Dữ liệu dashboard |
 | Đơn vị | `/api/don-vi` | CRUD đơn vị |
 | Vị trí | `/api/vi-tri` | CRUD vị trí |
 | Loại tài sản | `/api/loai-tai-san` | CRUD loại tài sản |
-| Người dùng | `/api/nguoidung` | CRUD user (Admin only) |
+| Trạng thái | `/api/trang-thai-tai-san` | Danh mục trạng thái |
+| Người dùng | `/api/nguoidung` | CRUD người dùng (Admin) |
+| Health | `/api/health` | Kiểm tra backend còn sống (public) |
 
-### Ví dụ API calls
+### Ví dụ gọi API
 
-**1. Login:**
-```bash
+**Đăng nhập:**
+
+```http
 POST /api/auth/login
 Content-Type: application/json
 
 {
-  "username": "admin",
-  "password": "admin123"
-}
-
-# Response:
-{
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "username": "admin",
-  "vaiTro": "ADMIN"
+  "tendangnhap": "admin",
+  "matkhau": "admin123"
 }
 ```
 
-**2. Lấy danh sách tài sản:**
-```bash
+Response (rút gọn):
+
+```json
+{
+  "success": true,
+  "message": "Đăng nhập thành công",
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIs...",
+    "type": "Bearer",
+    "nguoidungId": 1,
+    "tendangnhap": "admin",
+    "hoten": "Quản trị viên",
+    "vaitro": "ADMIN",
+    "quyenhan": []
+  }
+}
+```
+
+**Lấy danh sách tài sản:**
+
+```http
 GET /api/tai-san
 Authorization: Bearer <token>
 ```
 
-**3. Sinh QR code:**
-```bash
+**Lấy QR code của tài sản:**
+
+```http
 GET /api/tai-san/{id}/qrcode
 Authorization: Bearer <token>
-
-# Response: Image (PNG)
 ```
 
 ## 🧪 Testing
 
-### Backend Testing
-
 ```bash
+# Backend
 cd backend
+.\mvnw.cmd test
 
-# Chạy tất cả tests
-mvn test
+# Build nhanh, bỏ qua test
+.\mvnw.cmd clean package -DskipTests
 
-# Chạy test với code coverage
-mvn test jacoco:report
-
-# Skip tests khi build
-mvn clean package -DskipTests
-```
-
-### Frontend Testing
-
-```bash
+# Frontend
 cd frontend
-
-# Chạy development server để test thủ công
-npm run dev
-
-# Build production để kiểm tra lỗi build
 npm run build
-
-# Preview production build
 npm run preview
 ```
 
-### Testing trên thiết bị di động
+### Test camera/QR trên điện thoại
 
-#### Cách 1: Dùng cùng mạng WiFi
+Camera chỉ hoạt động trên `localhost` hoặc HTTPS. Cách đơn giản nhất là dùng bản đã deploy:
 
-1. **Kiểm tra IP máy tính:**
-   ```bash
-   # Windows
-   ipconfig
-   # Tìm "IPv4 Address" của WiFi adapter
-   
-   # Linux/Mac
-   ifconfig
-   # hoặc
-   ip addr show
-   ```
-
-2. **Frontend đã cấu hình `host: true`** trong `vite.config.js`
-
-3. **Truy cập từ điện thoại:**
-   ```
-   http://<YOUR_IP>:5173
-   
-   # Ví dụ:
-   http://192.168.1.100:5173
-   ```
-
-#### Cách 2: Dùng ngrok (khuyến nghị cho camera)
-
-Camera chỉ hoạt động trên:
-- ✅ `localhost` (khi dev trên máy tính)
-- ✅ HTTPS domains (bất kỳ)
-- ❌ HTTP qua IP (bị browser chặn vì bảo mật)
-
-**Cài đặt ngrok:**
-```bash
-# Cài qua npm
-npm install -g ngrok
-
-# Hoặc tải binary: https://ngrok.com/download
+```
+https://trannhutthien.github.io/quanlytaisan/
 ```
 
-**Tạo tunnel HTTPS:**
+Nếu test local, có thể dùng ngrok:
+
 ```bash
-# Chạy ngrok
 ngrok http 5173
-
-# Ngrok sẽ cho bạn URL HTTPS:
-# https://abc123.ngrok.io -> http://localhost:5173
 ```
 
-**Truy cập từ điện thoại:**
+## ☁️ Triển khai
+
+### Quy trình tổng quát
+
 ```
-https://abc123.ngrok.io
-```
-
-> 💡 URL ngrok thay đổi mỗi lần khởi động (free tier). Upgrade để có fixed domain.
-
-## 🚀 Deployment
-
-### Backend Deployment
-
-#### Cách 1: Deploy JAR file
-
-```bash
-cd backend
-
-# Build JAR file
-mvn clean package -DskipTests
-
-# File JAR tạo tại:
-# target/quanlytaisan-1.0.0.jar
-
-# Chạy trên server
-java -jar target/quanlytaisan-1.0.0.jar
-
-# Hoặc chỉ định profile
-java -jar -Dspring.profiles.active=prod target/quanlytaisan-1.0.0.jar
+push lên nhánh main
+   ├── GitHub Actions build frontend → deploy GitHub Pages
+   └── Render tự build Docker backend → deploy Web Service
 ```
 
-#### Cách 2: Deploy với Docker (tùy chọn)
+### Frontend – GitHub Pages
 
-```dockerfile
-# Dockerfile example
-FROM eclipse-temurin:17-jdk-alpine
-VOLUME /tmp
-COPY target/quanlytaisan-1.0.0.jar app.jar
-ENTRYPOINT ["java","-jar","/app.jar"]
-```
+- Repo: **Settings → Pages → Source: GitHub Actions**.
+- Workflow: `.github/workflows/deploy.yml`, chạy khi push `main` hoặc chạy tay.
+- Biến build: **Settings → Secrets and variables → Actions → Variables**
+  - `VITE_API_URL = https://<tên-dịch-vụ>.onrender.com/api`
+- `vite.config.js` dùng `base: '/quanlytaisan/'` khớp tên repo.
+- Ứng dụng dùng `HashRouter` nên refresh trang con không bị 404 trên Pages.
+- Sau khi đổi `VITE_API_URL` phải chạy lại workflow vì biến được nhúng lúc build.
 
-```bash
-# Build image
-docker build -t quanlytaisan-backend .
+### Backend – Render
 
-# Run container
-docker run -p 8080:8080 \
-  -e SPRING_DATASOURCE_URL=jdbc:mysql://host.docker.internal:3306/quanlytaisanqr \
-  -e SPRING_DATASOURCE_PASSWORD=your_password \
-  quanlytaisan-backend
-```
+1. **New → Web Service**, chọn repo `trannhutthien/quanlytaisan`.
+2. Cấu hình:
+   - Language: **Docker**
+   - Root Directory: `backend`
+   - Region: **Singapore**
+   - Instance Type: **Free**
+   - Health Check Path: `/api/health`
+3. Khai báo Environment Variables:
 
-#### Production Checklist
+| Key | Giá trị |
+|-----|---------|
+| `DB_URL` | `jdbc:mysql://<TIDB_HOST>:4000/quanlytaisanqr?sslMode=VERIFY_IDENTITY&enabledTLSProtocols=TLSv1.2,TLSv1.3` |
+| `DB_USERNAME` | `<user TiDB>.root` |
+| `DB_PASSWORD` | `<mật khẩu TiDB>` |
+| `JWT_SECRET` | chuỗi ngẫu nhiên tối thiểu 32 ký tự |
+| `CORS_ALLOWED_ORIGINS` | `https://trannhutthien.github.io` |
+| `QR_BASE_URL` | `https://trannhutthien.github.io/quanlytaisan/#/assets/` |
+| `DDL_AUTO` | `update` lần đầu, sau đó đổi thành `validate` |
 
-- [ ] Đổi JWT secret key trong `application-prod.yml`
-- [ ] Cấu hình database production
-- [ ] Bật HTTPS
-- [ ] Cấu hình CORS cho domain production
-- [ ] Đổi password tài khoản admin mặc định
-- [ ] Setup backup database tự động
-- [ ] Cấu hình logging (file log, level)
-- [ ] Setup monitoring (optional)
+4. Kiểm tra: `https://<tên-dịch-vụ>.onrender.com/api/health` trả về `OK`.
 
-### Frontend Deployment
+### Database – TiDB Cloud
 
-#### Build production
+- Tạo cluster Serverless, database `quanlytaisanqr`.
+- Kết nối qua cổng **4000** kèm `sslMode=VERIFY_IDENTITY`.
+- Render không có IP tĩnh: nếu TiDB bật IP Access List, cần cho phép truy cập từ mọi IP và dùng mật khẩu mạnh.
+- Import schema từ `backend/src/main/resources/db/quanlytaisanqr_gon.sql` nếu database còn trống.
 
-```bash
-cd frontend
+### Lưu ý vận hành
 
-# Build
-npm run build
-
-# Thư mục `dist/` chứa static files
-```
-
-#### Deploy lên web server
-
-**Option 1: Nginx**
-
-```nginx
-server {
-    listen 80;
-    server_name your-domain.com;
-    
-    root /var/www/quanlytaisan/dist;
-    index index.html;
-    
-    # React Router support
-    location / {
-        try_files $uri $uri/ /index.html;
-    }
-    
-    # Proxy API requests to backend
-    location /api {
-        proxy_pass http://localhost:8080;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-}
-```
-
-**Option 2: Apache**
-
-```apache
-<VirtualHost *:80>
-    ServerName your-domain.com
-    DocumentRoot /var/www/quanlytaisan/dist
-    
-    <Directory /var/www/quanlytaisan/dist>
-        Options Indexes FollowSymLinks
-        AllowOverride All
-        Require all granted
-        
-        # React Router support
-        RewriteEngine On
-        RewriteBase /
-        RewriteRule ^index\.html$ - [L]
-        RewriteCond %{REQUEST_FILENAME} !-f
-        RewriteCond %{REQUEST_FILENAME} !-d
-        RewriteRule . /index.html [L]
-    </Directory>
-</VirtualHost>
-```
-
-**Option 3: Vercel/Netlify (Static hosting)**
-
-```bash
-# Deploy lên Vercel
-npm install -g vercel
-cd frontend
-vercel
-
-# Deploy lên Netlify
-npm install -g netlify-cli
-cd frontend
-netlify deploy --prod --dir=dist
-```
-
-> ⚠️ **Lưu ý:** Cập nhật `VITE_API_URL` trong `.env` hoặc `.env.production` với URL backend production
-
-#### Production Checklist
-
-- [ ] Cấu hình `.env.production` với API URL production
-- [ ] Build production: `npm run build`
-- [ ] Test production build: `npm run preview`
-- [ ] Setup HTTPS (Let's Encrypt)
-- [ ] Cấu hình CORS trên backend cho domain frontend
-- [ ] Test camera trên HTTPS
-- [ ] Setup CDN (optional)
-
-## 📖 Hướng dẫn chi tiết
-
-- 📘 **Hướng dẫn chạy ứng dụng**: [HUONG_DAN_CHAY_UNG_DUNG.md](HUONG_DAN_CHAY_UNG_DUNG.md)
-- 🔧 **Hướng dẫn sửa lỗi Java/Lombok**: [HUONG_DAN_SUA_LOI_LOMBOK.md](HUONG_DAN_SUA_LOI_LOMBOK.md)
-- 🔒 **Hướng dẫn bảo mật**: [SECURITY.md](SECURITY.md)
-- 📋 **Kế hoạch phát triển**: [docx/Danh sách xây dựng chức năng.md](docx/Danh%20sách%20xây%20dựng%20chức%20năng%20–%20Hệ%20thống%20quản%20lý%20tài%20sản%20bằng%20mã%20QR.md)
-- 💻 **Backend README**: [backend/README.md](backend/README.md)
-- 🎨 **Frontend README**: [frontend/README.md](frontend/README.md)
+- Render Free ngủ sau 15 phút; có thể gọi `/api/health` mỗi 10 phút bằng cron-job.org trước buổi demo.
+- Đổi `DDL_AUTO` sang `validate` sau khi schema ổn định.
+- Sao lưu database định kỳ trước các buổi báo cáo.
 
 ## 🔒 Bảo mật
 
-### ⚠️ Checklist trước khi push code lên Git
+- **Không commit** các file chứa thông tin thật:
+  - `backend/src/main/resources/application-local.yml`
+  - `backend/src/main/resources/application-tidb.yml`
+  - `backend/src/main/resources/application-prod.yml`
+  - `frontend/.env`, `.env.local`, `.env.production`
+- Tất cả bí mật (`DB_PASSWORD`, `JWT_SECRET`, ...) chỉ đặt trong Environment Variables của Render.
+- `CORS_ALLOWED_ORIGINS` chỉ khai báo đúng origin frontend, không dùng `*`.
+- Nếu thông tin database/JWT từng bị commit hoặc chia sẻ công khai, hãy **đổi mật khẩu/khóa ngay** và cập nhật lại Render.
+- Đổi mật khẩu tài khoản admin mặc định trước khi dùng thật.
 
-- [ ] **KHÔNG commit** file `.env` (đã có trong `.gitignore`)
-- [ ] **KHÔNG commit** file `application-dev.yml` hoặc `application-prod.yml` (nếu chứa password thật)
-- [ ] **KHÔNG hard-code** password/API key trong code
-- [ ] **ĐÃ TẠO** file `.env.example` và `application.yml.example` (template không chứa password)
-- [ ] **ĐÃ KIỂM TRA** `.gitignore` hoàn chỉnh
+## 📖 Tài liệu
 
-### Các file KHÔNG được commit
+Thư mục [`docx/`](docx) chứa:
 
-```
-# Backend
-backend/src/main/resources/application-dev.yml
-backend/src/main/resources/application-prod.yml
-backend/src/main/resources/application-local.yml
-
-# Frontend
-frontend/.env
-frontend/.env.local
-frontend/.env.production
-
-# Database
-*.sql (nếu chứa dữ liệu thật)
-```
-
-Xem chi tiết: [SECURITY.md](SECURITY.md)
-
-## 🤝 Đóng góp
-
-Chúng tôi hoan nghênh mọi đóng góp! Để đóng góp:
-
-1. **Fork** repository này
-2. **Tạo branch** cho feature: `git checkout -b feature/TinhNangMoi`
-3. **Commit** changes: `git commit -m 'Thêm tính năng XYZ'`
-4. **Push** lên branch: `git push origin feature/TinhNangMoi`
-5. **Tạo Pull Request**
-
-### Quy tắc khi đóng góp
-
-- Code phải follow convention của dự án
-- Viết commit message rõ ràng (tiếng Việt OK)
-- Test kỹ trước khi tạo PR
-- Không commit file config chứa password
-
-## 📄 License
-
-[MIT License](LICENSE) - Xem file LICENSE để biết chi tiết
+- Hướng dẫn đưa frontend lên GitHub Pages.
+- Hướng dẫn đưa backend Spring Boot lên Render.
+- Danh sách chức năng và sơ đồ dự án.
+- Báo cáo tiến độ.
 
 ## 📧 Liên hệ
 
-- **Email**: [your-email@example.com]
-- **GitHub**: [https://github.com/yourusername/quanlytaisanqr]
-- **Issues**: [https://github.com/yourusername/quanlytaisanqr/issues]
+- **GitHub**: [trannhutthien/quanlytaisan](https://github.com/trannhutthien/quanlytaisan)
+- **Issues**: [github.com/trannhutthien/quanlytaisan/issues](https://github.com/trannhutthien/quanlytaisan/issues)
 
 ---
 
-**Made with ❤️ by TVU Team**
+**Đồ án tốt nghiệp – TVU**

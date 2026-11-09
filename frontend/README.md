@@ -1,33 +1,50 @@
-# Frontend - Hệ thống Quản lý Tài sản bằng mã QR
+# Frontend – Hệ thống Quản lý Tài sản bằng mã QR
 
-Frontend được xây dựng bằng ReactJS 18 + Vite + Ant Design 5.
+Giao diện ReactJS 18 + Vite + Ant Design 5 cho hệ thống quản lý tài sản bằng mã QR.
+
+- **Trang web**: https://trannhutthien.github.io/quanlytaisan/
+- **API backend**: https://quanlytaisan-6hhw.onrender.com/api
+- **Repository**: https://github.com/trannhutthien/quanlytaisan
 
 ## Công nghệ sử dụng
 
-- **ReactJS 18**: Framework UI
-- **Vite**: Build tool
-- **Ant Design 5**: Thư viện UI components
-- **React Router DOM 6**: Điều hướng
-- **Axios**: HTTP client
-- **html5-qrcode**: Quét mã QR
-- **Recharts**: Biểu đồ
-- **DayJS**: Xử lý ngày tháng
+| Nhóm | Công nghệ |
+|------|-----------|
+| Framework | React 18.3.1, Vite 5.4.2 |
+| UI | Ant Design 5.20.0, @ant-design/icons 5.4.0 |
+| Routing | React Router DOM 6.26.0 (HashRouter) |
+| HTTP | Axios 1.7.5 |
+| Quét QR | html5-qrcode 2.3.8 |
+| Biểu đồ | Recharts 2.12.7 |
+| Ngày tháng | DayJS 1.11.12 |
 
-## Cài đặt
+Hosting trên **GitHub Pages**, CI/CD bằng **GitHub Actions**, build với base path `/quanlytaisan/`.
 
-### 1. Cài đặt dependencies
+## Cài đặt và chạy local
+
+### 1. Cài dependencies
 
 ```bash
 npm install
 ```
 
-### 2. Cấu hình
+### 2. Cấu hình API URL
 
-File `.env` đã được tạo sẵn với cấu hình mặc định:
+```bash
+# Windows
+copy .env.example .env
 
+# Linux/Mac
+cp .env.example .env
 ```
+
+Nội dung `frontend/.env`:
+
+```env
 VITE_API_URL=http://localhost:8080/api
 ```
+
+File `.env` đã nằm trong `.gitignore`, không push lên Git.
 
 ### 3. Chạy development server
 
@@ -35,7 +52,7 @@ VITE_API_URL=http://localhost:8080/api
 npm run dev
 ```
 
-Ứng dụng sẽ chạy tại: `http://localhost:5173`
+Ứng dụng chạy tại: `http://localhost:5173/quanlytaisan/` (do `base: '/quanlytaisan/'` trong `vite.config.js`).
 
 ### 4. Build production
 
@@ -43,114 +60,71 @@ npm run dev
 npm run build
 ```
 
+## Triển khai lên GitHub Pages
+
+- Workflow: [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml), tự chạy khi push nhánh `main`.
+- Repository variable: **Settings → Secrets and variables → Actions → Variables**
+  - `VITE_API_URL = https://quanlytaisan-6hhw.onrender.com/api`
+- **Settings → Pages → Source: GitHub Actions**.
+- Biến `VITE_API_URL` được nhúng lúc build, nên sau khi đổi giá trị phải chạy lại workflow.
+
+Ứng dụng dùng `HashRouter` để các route như `/#/assets/1` hoạt động khi refresh trên GitHub Pages. Mã QR cũng trỏ tới dạng URL này.
+
 ## Cấu trúc thư mục
 
 ```
 frontend/
 ├── src/
-│   ├── api/              # API clients (axios)
-│   ├── components/       # Shared components
-│   ├── context/          # React contexts (Auth)
-│   ├── hooks/            # Custom hooks
-│   ├── layouts/          # Layout components
-│   ├── pages/            # Page components
+│   ├── api/              # Axios clients (authApi, taisanApi, ...)
+│   ├── components/       # QrScanner, QrImage, StatusTag, ConfirmDialog, ...
+│   ├── context/          # AuthContext
+│   ├── hooks/            # useAuth, useAutoCode
+│   ├── layouts/          # MainLayout (sidebar), LoginLayout
+│   ├── pages/
 │   │   ├── dangnhap/     # Đăng nhập
-│   │   ├── dashboard/    # Dashboard
+│   │   ├── dashboard/    # Dashboard ADMIN và USER
 │   │   ├── taisan/       # Quản lý tài sản
 │   │   ├── quetqr/       # Quét QR
 │   │   ├── luanchuyen/   # Luân chuyển
 │   │   ├── kiemke/       # Kiểm kê
-│   │   └── nguoidung/    # Người dùng
-│   ├── routes/           # Route configuration
-│   ├── utils/            # Utilities
-│   ├── App.jsx           # Root component
-│   └── main.jsx          # Entry point
-├── index.html
+│   │   ├── admin/        # Bảo trì, đơn vị/vị trí, loại tài sản, tài sản
+│   │   └── nguoidung/    # Quản lý người dùng
+│   ├── routes/           # AppRoutes
+│   ├── utils/            # constants, format, permissions
+│   ├── App.jsx
+│   └── main.jsx
+├── .env.example
 ├── vite.config.js
 └── package.json
 ```
 
 ## Tính năng đã triển khai
 
-### Core Infrastructure
-- ✅ Cấu hình Vite + React
-- ✅ Routing với React Router DOM
-- ✅ Authentication Context
-- ✅ Private Route & Admin Route
-- ✅ Axios client với JWT interceptor
-- ✅ Layout chính với menu sidebar
-- ✅ Login layout
+- Đăng nhập JWT, phân quyền ADMIN/USER theo trang.
+- CRUD tài sản, tìm kiếm/lọc, xem chi tiết, sinh và in mã QR.
+- Quét QR bằng camera, mở thẳng trang chi tiết tài sản.
+- Luân chuyển (bàn giao, thu hồi, điều chuyển), bảo trì, kiểm kê.
+- Dashboard thống kê cho ADMIN và USER, biểu đồ Recharts.
+- Quản lý người dùng, phân quyền, đổi mật khẩu.
+- Giao diện responsive cho điện thoại và tablet.
 
-### Components
-- ✅ StatusTag - Hiển thị trạng thái tài sản
-- ✅ QrScanner - Quét mã QR bằng camera
-- ✅ QrImage - Hiển thị và in mã QR
-- ✅ ConfirmDialog - Dialog xác nhận
-
-### Pages
-- ✅ Trang đăng nhập (DangNhap)
-- ✅ Dashboard với thống kê
-- ✅ Danh sách tài sản (TaiSanList) với tìm kiếm
-- ✅ Chi tiết tài sản (TaiSanDetail) với QR code
-- ✅ Quét QR (QuetQR)
-- ⏳ Form thêm/sửa tài sản (placeholder)
-- ⏳ Các trang khác (placeholder)
-
-### API Clients
-- ✅ authApi - Đăng nhập, lấy thông tin user
-- ✅ taisanApi - CRUD tài sản, QR code, lịch sử
-- ✅ luanchuyenApi - Bàn giao, thu hồi, điều chuyển
-- ✅ baotriApi - Báo hỏng, sửa chữa
-- ✅ kiemkeApi - Kiểm kê
-- ✅ nguoidungApi - Quản lý người dùng
-- ✅ thongkeApi - Dashboard statistics
-
-## Chức năng cần phát triển
-
-1. **Form thêm/sửa tài sản** - Hoàn thiện TaiSanForm
-2. **Quản lý luân chuyển** - UI cho bàn giao, thu hồi, điều chuyển
-3. **Quản lý bảo trì** - UI cho báo hỏng và sửa chữa
-4. **Quản lý kiểm kê** - Tạo đợt kiểm kê và ghi nhận kết quả
-5. **Quản lý danh mục** - CRUD cho đơn vị, vị trí, loại tài sản
-6. **Quản lý người dùng** - CRUD và phân quyền
-
-## Lưu ý khi phát triển
+## Lưu ý
 
 ### Authentication
-- Token JWT được lưu trong `localStorage`
-- Axios interceptor tự động gắn token vào header
-- Tự động redirect về trang login khi nhận 401
-
-### Phân quyền
-- USER: Xem tài sản, quét QR, báo hỏng
-- ADMIN: Full quyền
+- Token JWT lưu trong `localStorage`, Axios tự gắn header `Authorization`.
+- Gặp 401 sẽ tự chuyển về trang đăng nhập kèm base path.
 
 ### Camera và HTTPS
-- Camera chỉ hoạt động trên HTTPS (trừ localhost)
-- Để test trên điện thoại thật, cần deploy với HTTPS hoặc dùng ngrok
+Camera chỉ hoạt động trên `localhost` hoặc HTTPS. Bản deploy GitHub Pages dùng HTTPS nên quét QR trên điện thoại hoạt động bình thường.
 
 ### Responsive
-- Giao diện Ant Design tự động responsive
-- Cần test kỹ trên mobile vì người dùng chủ yếu dùng điện thoại để quét QR
-
-## Kết nối Backend
-
-Backend Spring Boot cần:
-1. Chạy ở `http://localhost:8080`
-2. Bật CORS cho `http://localhost:5173`
-3. Implement các API endpoint theo contract đã định nghĩa
+- Điện thoại: card list, phân trang đơn giản, modal full chiều rộng.
+- Tablet/desktop: bảng đầy đủ, thao tác trong dropdown.
 
 ## Scripts
 
-- `npm run dev` - Chạy development server
-- `npm run build` - Build production
-- `npm run preview` - Preview production build
-
-## Trình duyệt hỗ trợ
-
-- Chrome (khuyến nghị)
-- Firefox
-- Safari
-- Edge
-
-Tính năng quét QR yêu cầu browser hỗ trợ WebRTC và getUserMedia API.
+| Lệnh | Mô tả |
+|------|-------|
+| `npm run dev` | Chạy development server |
+| `npm run build` | Build production vào `dist/` |
+| `npm run preview` | Xem thử bản production build |
